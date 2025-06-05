@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鸟类识别 - 用户注册</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --hover-color: #45a049;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-2px);
+        }
+
+        h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .code-input {
+            flex: 1;
+        }
+
+        .send-code-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .send-code-btn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-1px);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-1px);
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .success {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .info {
+            color: #3498db;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>注册鸟类识别账号</h2>
+    <form method="post" action="{% url 'register' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" id="username" name="username" required
+                   placeholder="请输入用户名">
+        </div>
+
+        <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" id="password" name="password" required
+                   placeholder="请输入密码">
+        </div>
+
+        <div class="form-group">
+            <label for="email">电子邮箱</label>
+            <input type="email" id="email" name="email" required
+                   placeholder="example@domain.com">
+        </div>
+
+        <div class="form-group">
+            <label for="code">验证码</label>
+            <div class="input-group">
+                <input type="text" id="code" name="code" required
+                       class="code-input" placeholder="请输入验证码">
+                <button type="button" class="send-code-btn"
+                        onclick="requestVerificationCode()">
+                    获取验证码
+                </button>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">立即注册</button>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        {% if success %}
+            <div class="success">{{ success }}</div>
+        {% endif %}
+        {% if info %}
+            <div class="info">{{ info }}</div>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+    function requestVerificationCode() {
+        const emailInput = document.getElementById('email');
+        const email = emailInput.value.trim();
+
+        if (!email) {
+            showError('请输入有效的电子邮箱地址');
+            return;
+        }
+
+        // 发送请求
+        fetch("{% url 'request_verification_code' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: `email=${encodeURIComponent(email)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+            } else {
+                showError(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('获取验证码时出错，请重试');
+        });
+
+        const btn = document.querySelector('.send-code-btn');
+        btn.disabled = true;
+        let countdown = 60;
+
+        const timer = setInterval(() => {
+            btn.textContent = `${countdown}s后重发`;
+            if (countdown-- <= 0) {
+                clearInterval(timer);
+                btn.disabled = false;
+                btn.textContent = '获取验证码';
+            }
+        }, 1000);
+    }
+
+    function showError(message) {
+        const errorDiv = document.querySelector('.error');
+        errorDiv.textContent = message;
+    }
+</script>
+</body>
+</html>

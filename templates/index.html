@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鸟类识别 - 主页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #38A169;
+            --secondary-color: #4299E1;
+            --background-gradient: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+            --text-color: #2D3748;
+            --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--background-gradient);
+            color: var(--text-color);
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        /* 主容器布局 */
+        .main-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* 导航栏样式 */
+        .nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            box-shadow: var(--shadow-medium);
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+
+        .nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav li {
+            margin-bottom: 0.75rem;
+            transition: transform 0.2s ease;
+        }
+
+        .nav li:hover {
+            transform: translateX(4px);
+        }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .nav a:hover {
+            background: rgba(66, 153, 225, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .nav i {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* 内容区域样式 */
+        .content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero-section h1 {
+            font-size: 2.5rem;
+            margin: 0 0 1rem;
+            color: var(--primary-color);
+            letter-spacing: -0.025em;
+        }
+
+        .hero-section p {
+            font-size: 1.1rem;
+            color: #4A5568;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* 功能卡片样式 */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer; /* 添加鼠标悬停时的指针样式 */
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            .nav {
+                position: static;
+                width: 100%;
+            }
+
+            .content {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 状态消息样式 */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .alert i {
+            font-size: 1.2rem;
+        }
+
+        .success {
+            background: #F0FFF4;
+            color: #38A169;
+            border: 1px solid #C6F6D5;
+        }
+
+        .error {
+            background: #FFF5F5;
+            color: #F56565;
+            border: 1px solid #FED7D7;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .feature-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+{% block header %}
+    <div class="main-container">
+        <nav class="nav">
+            <ul>
+                <li>
+                    <a href="{% url 'audio_recognition' %}">
+                        <i class="fas fa-music"></i>
+                        <span>鸟声识别</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'image_recognition' %}">
+                        <i class="fas fa-camera"></i>
+                        <span>鸟图片识别</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'deepseek_api' %}">
+                        <i class="fas fa-comment-dots"></i>
+                        <span>DeepSeek对话</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'clean_media_folder' %}">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>清理媒体文件</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'logout' %}">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>退出登录</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        {% block content %}
+            <main class="content">
+                <section class="hero-section">
+                    <h1>探索鸟类世界</h1>
+                    <p>通过先进的AI技术，识别鸟类声音和图像，并与智能对话系统互动获取更多信息。</p>
+                </section>
+
+                <div class="feature-grid">
+                    <a href="{% url 'audio_recognition' %}" class="feature-link">
+                        <article class="feature-card">
+                            <i class="fas fa-music feature-icon"></i>
+                            <h2>鸟声识别</h2>
+                            <p>上传鸟类录音文件，我们的AI系统将快速并返回鸟类品种信息。</p>
+                        </article>
+                    </a>
+
+                    <a href="{% url 'image_recognition' %}" class="feature-link">
+                        <article class="feature-card">
+                            <i class="fas fa-camera feature-icon"></i>
+                            <h2>鸟图片识别</h2>
+                            <p>支持JPG/PNG格式图片上传，通过图像识别技术获取详细的鸟类信息。</p>
+                        </article>
+                    </a>
+
+                    <a href="{% url 'deepseek_api' %}" class="feature-link">
+                        <article class="feature-card">
+                            <i class="fas fa-comment-dots feature-icon"></i>
+                            <h2>智能对话</h2>
+                            <p>与DeepSeek AI进行自然语言交互，获取鸟类相关知识和生态信息。</p>
+                        </article>
+                    </a>
+                </div>
+                {% if error %}
+                    <div class="alert error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ error }}
+                    </div>
+                {% endif %}
+                {% if success %}
+                    <div class="alert success">
+                        <i class="fas fa-check-circle"></i>
+                        {{ success }}
+                    </div>
+                {% endif %}
+            </main>
+        {% endblock %}
+    </div>
+{% endblock %}
+</body>
+</html>

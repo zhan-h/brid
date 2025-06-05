@@ -1,0 +1,63 @@
+{% extends "index.html" %}
+{% block content %}
+        <main class="content">
+            <div class="feature-grid">
+                <article class="feature-card">
+                    <i class="fas fa-camera feature-icon"></i>
+                    <h2>鸟图片识别</h2>
+                    <p>支持JPG/PNG格式图片上传，通过图像识别技术获取详细的鸟类信息。</p>
+                    <div class="image-upload-form">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="file" name="image_file" accept="image/*">
+                            <button type="submit">识别</button>
+                        </form>
+                        {% if error %}
+                            <div class="alert error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ error }}
+                            </div>
+                        {% endif %}
+                        {% if image_url %}
+                            <div class="image-result">
+                                <h2>上传的图像</h2>
+                                <img src="{{ image_url }}" alt="上传的图像">
+                            </div>
+                        {% endif %}
+                        {% if result %}
+                            <div class="image-result">
+                                <h2>预测结果</h2>
+                                <p>预测的鸟类名称: {{ result.predicted_class }}</p>
+                                <p>预测的概率: {{ result.confidence }}</p>
+                                <h3>前两个概率最高的类别</h3>
+                                <ul>
+                                    {% for class_name, prob in result.top_two_probabilities.items %}
+                                        <li>{{ class_name }}: {{ prob }}</li>
+                                    {% endfor %}
+                                </ul>
+                                <h3>所有类别的概率</h3>
+                                <ul>
+                                    {% for class_name, prob in result.probabilities.items %}
+                                        <li>{{ class_name }}: {{ prob }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                </article>
+
+            </div>
+            {% if error %}
+                <div class="alert error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ error }}
+                </div>
+            {% endif %}
+            {% if success %}
+                <div class="alert success">
+                    <i class="fas fa-check-circle"></i>
+                    {{ success }}
+                </div>
+            {% endif %}
+        </main>
+{% endblock %}

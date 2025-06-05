@@ -1,0 +1,10 @@
+librosa~=0.11.0
+numpy~=2.2.6
+torch~=2.7.1+cu128
+django~=5.2.2
+torchvision~=0.22.1+cu128
+requests~=2.32.3
+tqdm~=4.67.1
+image~=1.5.33
+scikit-learn~=1.6.1
+pillow~=11.2.1

@@ -1,0 +1,174 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block content %}
+    <div class="content">
+        <h1>鸟类声音识别</h1>
+        <!-- 上传表单 -->
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="upload-box">
+                <input type="file" name="audio_file" accept=".mp3" required>
+                <button type="submit">上传分析</button>
+            </div>
+        </form>
+        <!-- 结果显示 -->
+        {% if result %}
+            <div class="result-card">
+                <h2>识别结果</h2>
+                {% if audio_url %}
+                    <div class="audio-player">
+                        <audio controls>
+                            <source src="{{ audio_url }}" type="audio/mp3">
+                            您的浏览器不支持音频播放
+                        </audio>
+                    </div>
+                {% endif %}
+
+                <div class="result-item">
+                    <span class="label">最可能物种：</span>
+                    <span class="value">{{ result.predicted_class }}</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">置信度：</span>
+                    <span class="value">{{ result.confidence }}</span>
+                    <span class="unit">如果置信度低于90%,请注意识别结果的准确性。</span>
+                </div>
+                <div class="probability-chart">
+                    {% for species, prob in result.probabilities.items %}
+                        <div class="chart-item">
+                            <div class="species">{{ species }}</div>
+                            <div class="progress-bar" style="width: {{ prob|slice:':-1' }}%;"></div>
+                            <div class="percentage">{{ prob }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        {% if error %}
+            <div class="error-card">
+                <h2>错误信息</h2>
+                <p>{{ error }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content {
+            padding: 1rem;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        .upload-box {
+            border: 2px dashed #38A169;
+            padding: 1rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .audio-player {
+            margin: 1rem 0;
+            width: 100%;
+        }
+
+        audio {
+            width: 100%;
+        }
+
+        .result-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .result-item {
+            margin: 0.5rem 0;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .label {
+            color: #4A5568;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .value {
+            color: #2D3748;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .unit {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .probability-chart {
+            margin-top: 1rem;
+        }
+
+        .chart-item {
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .species {
+            flex: 1;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #38A169;
+            border-radius: 4px;
+            margin: 0 0.5rem;
+            flex: 2;
+        }
+
+        .percentage {
+            text-align: right;
+            color: #718096;
+        }
+
+        .error-card {
+            background: #f8d7da;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            color: #721c24;
+        }
+
+        @media (max-width: 600px) {
+            .upload-box, .result-card, .error-card {
+                padding: 0.5rem;
+            }
+
+            .result-item, .chart-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .value, .percentage {
+                margin-top: 0.5rem;
+            }
+
+            .unit {
+                font-size: 0.8rem;
+                margin-top: 0.25rem;
+            }
+        }
+    </style>
+{% endblock %}
